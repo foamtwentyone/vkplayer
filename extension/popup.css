@@ -1,0 +1,30 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; width: 300px; padding: 14px 16px 12px;
+  font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+  background: #17191c; color: #e7e9ec;
+}
+header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+h1 { font-size: 15px; font-weight: 600; margin: 0; }
+.status { display: grid; gap: 4px; margin-bottom: 12px; color: #aab0b8; }
+.row { display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #5c6168; flex: none; }
+.dot.ok { background: #3ddc84; }
+.dot.warn { background: #ffb74d; }
+.dot.err { background: #ff5c5c; }
+.track { background: #202328; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; min-height: 52px; }
+.title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.artist { color: #9aa1a9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.controls button {
+  width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+  background: #2a2e34; color: #e7e9ec; font-size: 16px;
+}
+.controls button.main { background: #0077ff; width: 46px; height: 46px; }
+.controls button:hover { filter: brightness(1.15); }
+.controls button:disabled { opacity: .4; cursor: default; }
+.hint { min-height: 18px; color: #ffb74d; font-size: 12px; text-align: center; }
+footer { display: flex; justify-content: space-between; margin-top: 8px; }
+.link { background: none; border: none; color: #5fa8ff; cursor: pointer; padding: 0; font: inherit; }
+.link:hover { text-decoration: underline; }

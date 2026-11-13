@@ -1,0 +1,261 @@
+<Window x:Class="VkHotkeys.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:VkHotkeys.App.Controls"
+        xmlns:conv="clr-namespace:VkHotkeys.App.Converters"
+        xmlns:vm="clr-namespace:VkHotkeys.App.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="VK Hotkeys" Width="980" Height="720" MinWidth="860" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
+        FontFamily="{StaticResource UiFont}" FontSize="13"
+        TextOptions.TextFormattingMode="Display" UseLayoutRounding="True"
+        Icon="pack://application:,,,/Assets/app.ico">
+
+    <Window.Resources>
+        <conv:StatusLevelToBrushConverter x:Key="StatusBrush" />
+        <conv:IssueLevelToBrushConverter x:Key="IssueBrush" />
+        <conv:IssueLevelToBorderConverter x:Key="IssueBorder" />
+        <conv:FractionToWidthConverter x:Key="FractionWidth" />
+        <BooleanToVisibilityConverter x:Key="BoolVis" />
+    </Window.Resources>
+
+    <Grid Margin="22,18,22,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- ======================================================== Заголовок -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Source="pack://application:,,,/Assets/app.ico" Width="34" Height="34" Margin="0,0,12,0" />
+                <StackPanel>
+                    <TextBlock Text="VK Hotkeys" FontSize="22" FontWeight="SemiBold" />
+                    <TextBlock Text="Управление музыкой ВКонтакте горячими клавишами — прямо в игре"
+                               Foreground="{StaticResource TextMutedBrush}" />
+                </StackPanel>
+            </StackPanel>
+
+            <Border HorizontalAlignment="Right" VerticalAlignment="Center" CornerRadius="14" Padding="12,6"
+                    Background="{StaticResource CardBrush}" BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="9" Height="9" Margin="0,0,8,0" VerticalAlignment="Center"
+                             Fill="{Binding StatusLevel, Converter={StaticResource StatusBrush}}" />
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ======================================================== Содержимое -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <!-- Сейчас играет -->
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="СЕЙЧАС ИГРАЕТ" Style="{StaticResource CardHeader}" />
+                            <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
+                            <TextBlock Text="{Binding Artist}" Foreground="{StaticResource TextMutedBrush}" Margin="0,2,0,0"
+                                       TextTrimming="CharacterEllipsis" ToolTip="{Binding Artist}" />
+
+                            <!-- Прогресс трека -->
+                            <Grid Margin="0,14,0,0" x:Name="ProgressHost" Height="4">
+                                <Border CornerRadius="2" Background="#FF30353C" />
+                                <Border CornerRadius="2" Background="{StaticResource AccentBrush}" HorizontalAlignment="Left">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{StaticResource FractionWidth}">
+                                            <Binding Path="Progress" />
+                                            <Binding ElementName="ProgressHost" Path="ActualWidth" />
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
+                            </Grid>
+                            <TextBlock Text="{Binding TimeText}" FontSize="11" Foreground="{StaticResource TextDimBrush}"
+                                       HorizontalAlignment="Right" Margin="0,4,0,0" />
+
+                            <!-- Кнопки -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,14">
+                                <Button Style="{StaticResource RoundIconButton}" Content="&#xE892;" Command="{Binding PreviousCommand}"
+                                        ToolTip="Предыдущий трек" />
+                                <Button Style="{StaticResource RoundAccentButton}" Content="{Binding PlayGlyph}" Margin="18,0"
+                                        Command="{Binding ToggleCommand}" ToolTip="Пауза / воспроизведение" />
+                                <Button Style="{StaticResource RoundIconButton}" Content="&#xE893;" Command="{Binding NextCommand}"
+                                        ToolTip="Следующий трек" />
+                            </StackPanel>
+
+                            <!-- Громкость -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="48" />
+                                </Grid.ColumnDefinitions>
+                                <Button Style="{StaticResource GhostIconButton}" FontSize="15" Width="34" Height="34"
+                                        Content="{Binding MuteGlyph}" Command="{Binding MuteCommand}"
+                                        ToolTip="Выключить звук / вернуть громкость" />
+                                <Slider Grid.Column="1" Minimum="0" Maximum="100" Margin="6,0,10,0" VerticalAlignment="Center"
+                                        SmallChange="1" LargeChange="5" IsEnabled="{Binding VolumeAvailable}"
+                                        Value="{Binding Volume, Mode=TwoWay}" ToolTip="Громкость плеера VK (не системная)" />
+                                <TextBlock Grid.Column="2" Text="{Binding VolumeText}" VerticalAlignment="Center"
+                                           HorizontalAlignment="Right" FontWeight="SemiBold" />
+                            </Grid>
+                            <TextBlock Text="{Binding LastAction}" Foreground="{StaticResource TextDimBrush}" FontSize="12"
+                                       Margin="0,10,0,0" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Параметры -->
+                    <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="ПАРАМЕТРЫ" Style="{StaticResource CardHeader}" />
+                            <CheckBox Style="{StaticResource ToggleSwitch}" Content="Запускать вместе с Windows"
+                                      IsChecked="{Binding StartWithWindows}" />
+                            <CheckBox Style="{StaticResource ToggleSwitch}" Content="Запускать свёрнутой в трей"
+                                      IsChecked="{Binding StartMinimized}" />
+                            <CheckBox Style="{StaticResource ToggleSwitch}" Content="Кнопка «Закрыть» сворачивает в трей"
+                                      IsChecked="{Binding CloseToTray}" />
+                            <CheckBox Style="{StaticResource ToggleSwitch}" Content="Уведомлять о смене трека"
+                                      IsChecked="{Binding NotifyOnTrackChange}" />
+                            <CheckBox Style="{StaticResource ToggleSwitch}" Content="Открывать VK Музыку, если нет подключения"
+                                      IsChecked="{Binding OpenVkIfNotConnected}" />
+
+                            <TextBlock Text="Уведомления" Foreground="{StaticResource TextMutedBrush}" Margin="0,12,0,6" />
+                            <Border Style="{StaticResource SegmentHost}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="notify" Content="Плашка поверх игры"
+                                                 IsChecked="{Binding NotifyOverlay}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="notify" Content="Windows"
+                                                 IsChecked="{Binding NotifyWindows}" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="notify" Content="Выкл"
+                                                 IsChecked="{Binding NotifyNone}" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="Перехват клавиш" Foreground="{StaticResource TextMutedBrush}" Margin="0,12,0,6" />
+                            <Border Style="{StaticResource SegmentHost}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="backend" Content="Хук клавиатуры (рекомендуется)"
+                                                 IsChecked="{Binding BackendHook}"
+                                                 ToolTip="Нажатие гарантированно не попадает в игру" />
+                                    <RadioButton Style="{StaticResource Segment}" GroupName="backend" Content="RegisterHotKey"
+                                                 IsChecked="{Binding BackendRegister}"
+                                                 ToolTip="Классический способ Windows; игра может видеть нажатие через Raw Input" />
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="48" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Шаг громкости" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+                                <Slider Grid.Column="1" Minimum="1" Maximum="25" IsSnapToTickEnabled="True" TickFrequency="1"
+                                        Value="{Binding VolumeStep}" Margin="0,4,10,4" />
+                                <TextBlock Grid.Column="2" Text="{Binding VolumeStep, StringFormat={}{0}%}" VerticalAlignment="Center"
+                                           HorizontalAlignment="Right" />
+                                <TextBlock Grid.Row="1" Text="Шаг перемотки" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+                                <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="60" IsSnapToTickEnabled="True" TickFrequency="1"
+                                        Value="{Binding SeekStep}" Margin="0,4,10,4" />
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SeekStep, StringFormat={}{0} с}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Горячие клавиши -->
+                <Border Grid.Column="2" Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="ГОРЯЧИЕ КЛАВИШИ" Style="{StaticResource CardHeader}" />
+                        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource TextDimBrush}" FontSize="12" Margin="0,-6,0,12"
+                                   Text="Кликните по полю и нажмите новую комбинацию. Backspace — очистить, Esc — отмена. Работают глобально, в том числе в полноэкранной Dota 2." />
+
+                        <ItemsControl ItemsSource="{Binding Hotkeys}" Focusable="False">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:HotkeyRowViewModel}">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="210" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" ToolTip="{Binding DefaultText}" />
+                                        <controls:HotkeyBox Grid.Column="1" Gesture="{Binding Gesture, Mode=TwoWay}"
+                                                            BorderBrush="{Binding Level, Converter={StaticResource IssueBorder}}" />
+                                        <Button Grid.Column="2" Style="{StaticResource GhostIconButton}" Content="&#xE711;" Margin="6,0,0,0"
+                                                Command="{Binding ClearCommand}" ToolTip="Убрать комбинацию" />
+                                        <Button Grid.Column="3" Style="{StaticResource GhostIconButton}" Content="&#xE777;"
+                                                Command="{Binding ResetCommand}" ToolTip="{Binding DefaultText}" />
+                                        <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Text="{Binding Issue}" FontSize="12" TextWrapping="Wrap"
+                                                   Margin="0,4,0,0" Foreground="{Binding Level, Converter={StaticResource IssueBrush}}"
+                                                   Visibility="{Binding HasIssue, Converter={StaticResource BoolVis}}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{Binding ValidationSummary}" FontSize="12" Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0" />
+
+                        <Border Height="1" Background="{StaticResource CardBorderBrush}" Margin="0,16,0,12" />
+                        <TextBlock Text="БРАУЗЕР" Style="{StaticResource CardHeader}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource ErrorBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding BridgeOk}" Value="True">
+                                                <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="{Binding BridgeStatus}" TextWrapping="Wrap" Foreground="{StaticResource TextMutedBrush}" />
+                        </StackPanel>
+                        <WrapPanel>
+                            <Button Style="{StaticResource LinkButton}" Content="Открыть папку расширения" Margin="0,0,18,4"
+                                    Command="{Binding OpenExtensionFolderCommand}" />
+                            <Button Style="{StaticResource LinkButton}" Content="Открыть VK Музыку" Margin="0,0,18,4"
+                                    Command="{Binding OpenVkCommand}" />
+                            <Button Style="{StaticResource LinkButton}" Content="Журнал" Margin="0,0,18,4"
+                                    Command="{Binding OpenLogCommand}" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- ======================================================== Нижняя панель -->
+        <Grid Grid.Row="2" Margin="0,14,0,0">
+            <TextBlock Text="{Binding SaveStatus}" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="По умолчанию" Command="{Binding DefaultsCommand}" Margin="0,0,10,0" />
+                <Button Content="Отменить" Command="{Binding RevertCommand}" Margin="0,0,10,0" />
+                <Button Content="Сохранить" Style="{StaticResource AccentButton}" Padding="22,8" Command="{Binding SaveCommand}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

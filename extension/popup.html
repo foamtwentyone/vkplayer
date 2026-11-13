@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>VK Hotkeys</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" alt="" width="20" height="20">
+    <h1>VK Hotkeys</h1>
+  </header>
+
+  <section class="status">
+    <div class="row"><span class="dot" id="dotApp"></span><span id="txtApp">Приложение…</span></div>
+    <div class="row"><span class="dot" id="dotVk"></span><span id="txtVk">VK…</span></div>
+  </section>
+
+  <section class="track">
+    <div class="title" id="title">—</div>
+    <div class="artist" id="artist"></div>
+  </section>
+
+  <section class="controls">
+    <button id="btnPrev" title="Предыдущий трек">⏮</button>
+    <button id="btnToggle" class="main" title="Пауза / воспроизведение">⏯</button>
+    <button id="btnNext" title="Следующий трек">⏭</button>
+  </section>
+
+  <div class="hint" id="hint"></div>
+
+  <footer>
+    <button id="btnOpenVk" class="link">Открыть VK Музыку</button>
+    <button id="btnReconnect" class="link">Переподключить</button>
+  </footer>
+  <script src="popup.js"></script>
+</body>
+</html>

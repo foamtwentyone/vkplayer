@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VkHotkeys.Core/VkHotkeys.Core.csproj" />
+    <Project Path="src/VkHotkeys.Bridge/VkHotkeys.Bridge.csproj" />
+    <Project Path="src/VkHotkeys.App/VkHotkeys.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VkHotkeys.Core.Tests/VkHotkeys.Core.Tests.csproj" />
+    <Project Path="tests/e2e/harness/E2EHarness.csproj" />
+  </Folder>
+</Solution>

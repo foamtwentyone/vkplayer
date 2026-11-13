@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "VK Hotkeys Bridge",
+  "short_name": "VK Hotkeys",
+  "version": "1.0.0",
+  "description": "Связывает музыкальный плеер VK с приложением VK Hotkeys для управления горячими клавишами во время игры.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3ZBdrIQSMalyA9mxgNpkvgo8V/LmOO9NxRnZzP2Euia+AF6Ua5psB9k071HDfYxChejY5vW8zeZGNmBdgZKdxTmHG0jShDoKlexQ5GkGnnO8YWrxXW6fHivFlj4ZPxNV6XxVGAOljj10Kj5eV5rTVeDjbtuuT/2WKToatkW2QqWq+lZPyAL3hHsi3DBcIjDIlYy2qKjTbyx32nCvwG/dcCNbixgqO1tjtXLL2h+8G9KpPEas0gaVs0hUMrwGKiW9dDDWMrg30bLN2CGXBw8RHQq+Bpgq1e4ahlwG6eO53/cwu5JQWBXzLLpWWZrP9dndhPiEW60k75PeeXlA7cCSRwIDAQAB",
+  "minimum_chrome_version": "111",
+  "permissions": ["nativeMessaging", "alarms", "scripting"],
+  "host_permissions": [
+    "https://vk.com/*",
+    "https://*.vk.com/*",
+    "https://vk.ru/*",
+    "https://*.vk.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://vk.com/*", "https://*.vk.com/*", "https://vk.ru/*", "https://*.vk.ru/*"],
+      "js": ["page.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://vk.com/*", "https://*.vk.com/*", "https://vk.ru/*", "https://*.vk.ru/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "VK Hotkeys",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+}

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- Только ради NotifyIcon (значок в трее) -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>VkHotkeys.App</RootNamespace>
+    <AssemblyName>VkHotkeys</AssemblyName>
+    <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <TieredPGO>true</TieredPGO>
+    <!-- DPI задаётся манифестом (WPF), предупреждение WinForms не относится к делу -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Исключаем неоднозначности WinForms/WPF из implicit usings -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\..\assets\app.ico" Link="Assets\app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VkHotkeys.Core\VkHotkeys.Core.csproj" />
+    <!-- Мост Native Messaging собирается рядом с приложением (VkHotkeys.Bridge.exe в той же папке) -->
+    <ProjectReference Include="..\VkHotkeys.Bridge\VkHotkeys.Bridge.csproj" />
+  </ItemGroup>
+</Project>

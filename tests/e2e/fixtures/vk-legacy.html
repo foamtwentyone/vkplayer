@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Fake VK (legacy ap player)</title></head>
+<body>
+<div class="top_audio_player"><span class="top_audio_player_title">—</span></div>
+<script>
+// Имитация плеера VK: объект window.ap (как в веб-версии VK), невидимый new Audio(),
+// обработчики Media Session для мультимедийных клавиш.
+(function () {
+  function tone(seconds) {
+    const rate = 8000, n = rate * seconds, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+    v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true);
+    v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.sin(i / 8) * 300, true);
+    return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  }
+  const playlist = [
+    ['1', '1', '', 'First &amp; Song', 'Artist One', 120],
+    ['2', '1', '', 'Second Song', 'Artist Two', 120],
+    ['3', '1', '', 'Third Song', 'Artist Three', 120],
+  ];
+  const src = tone(120);
+  const audio = new Audio();
+  let idx = 0, vol = 0.8;
+  window.__log = [];
+  function load(i, autoplay) {
+    idx = (i + playlist.length) % playlist.length;
+    audio.src = src + '#' + idx;
+    const t = playlist[idx];
+    document.querySelector('.top_audio_player_title').textContent = t[4] + ' – ' + t[3].replace('&amp;', '&');
+    navigator.mediaSession.metadata = new MediaMetadata({ title: t[3].replace('&amp;', '&'), artist: t[4] });
+    if (autoplay) audio.play();
+  }
+  const player = {
+    play() { window.__log.push('ap.play'); if (!audio.src) load(0, true); else audio.play(); },
+    pause() { window.__log.push('ap.pause'); audio.pause(); },
+    isPlaying() { return !audio.paused; },
+    playNext() { window.__log.push('ap.playNext'); load(idx + 1, true); },
+    playPrev() { window.__log.push('ap.playPrev'); load(idx - 1, true); },
+    getCurrentAudio() { return audio.src ? playlist[idx] : null; },
+    setVolume(v) { vol = v; audio.volume = v * v; },   // VK применяет нелинейную кривую громкости
+    getVolume() { return vol; },
+    seek(p) { audio.currentTime = p * audio.duration; },
+    getCurrentProgress() { return audio.duration ? audio.currentTime / audio.duration : 0; },
+  };
+  // mode=full — ap + Media Session (как настоящий VK); ap — только ap; ms — только Media Session.
+  window.__mode = new URLSearchParams(location.search).get('mode') || 'full';
+  if (window.__mode !== 'ms') window.ap = player;
+  if (window.__mode !== 'ap') {
+    navigator.mediaSession.setActionHandler('nexttrack', () => { window.__log.push('ms.next'); player.playNext(); });
+    navigator.mediaSession.setActionHandler('previoustrack', () => { window.__log.push('ms.prev'); player.playPrev(); });
+    navigator.mediaSession.setActionHandler('play', () => { window.__log.push('ms.play'); player.play(); });
+    navigator.mediaSession.setActionHandler('pause', () => { window.__log.push('ms.pause'); player.pause(); });
+    navigator.mediaSession.setActionHandler('seekto', (d) => { window.__log.push('ms.seekto'); audio.currentTime = d.seekTime; });
+  }
+  audio.volume = vol * vol;
+  window.__audio = audio;
+  window.__start = () => load(0, true);
+  window.__state = () => ({ idx, vol, elVolume: audio.volume, paused: audio.paused, time: audio.currentTime, log: window.__log.slice() });
+})();
+</script>
+</body></html>
